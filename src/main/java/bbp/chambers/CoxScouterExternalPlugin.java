@@ -43,7 +43,6 @@ import net.runelite.client.chat.ChatColorType;
 import net.runelite.client.chat.ChatMessageBuilder;
 import net.runelite.client.chat.ChatMessageManager;
 import net.runelite.client.chat.QueuedMessage;
-import net.runelite.client.config.Keybind;
 import net.runelite.client.config.RuneLiteConfig;
 import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.events.OverlayMenuClicked;
@@ -141,6 +140,9 @@ public class CoxScouterExternalPlugin extends Plugin
 
 	@Getter
 	private final Set<String> layoutWhitelist = new HashSet<String>();
+
+	@Getter
+	private final Set<String> roomHighlightedList = new HashSet<String>();
 
 	@Getter
 	private final Map<String, List<Integer>> recommendedItemsList = new HashMap<>();
@@ -243,6 +245,7 @@ public class CoxScouterExternalPlugin extends Plugin
 		updateList(roomWhitelist, configManager.getConfiguration("raids", "whitelistedRooms"));
 		updateList(roomBlacklist, configManager.getConfiguration("raids", "blacklistedRooms"));
 		updateList(layoutWhitelist, configManager.getConfiguration("raids", "whitelistedLayouts"));
+		updateList(roomHighlightedList, config.highlightedRooms());
 		updateMap(recommendedItemsList, config.recommendedItems());
 
 		// Update rotation whitelist

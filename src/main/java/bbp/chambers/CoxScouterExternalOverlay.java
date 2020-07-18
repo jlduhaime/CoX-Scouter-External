@@ -139,6 +139,48 @@ public class CoxScouterExternalOverlay extends OverlayPanel
 			color = Color.RED;
 		}
 
+		boolean hide = false;
+		HashSet<String> roomNames = new HashSet();
+		for (Room layoutRoom : plugin.getRaid().getLayout().getRooms())
+		{
+			int position = layoutRoom.getPosition();
+			RaidRoom room = plugin.getRaid().getRoom(position);
+
+			if (room == null)
+			{
+				continue;
+			}
+			roomNames.add(room.getName().toLowerCase());
+
+			if (config.hideBlacklisted() && plugin.getRoomBlacklist().contains(room.getName().toLowerCase()))
+			{
+				hide = true;
+				break;
+			}
+		}
+
+		if (!hide && config.hideMissingHighlighted())
+		{
+			for (String requiredRoom : plugin.getRoomHighlightedList())
+			{
+				if (!roomNames.contains(requiredRoom))
+				{
+					hide = true;
+					break;
+				}
+			}
+		}
+
+		if (hide)
+		{
+			panelComponent.getChildren().add(TitleComponent.builder()
+					.text("Bad Raid!")
+					.color(Color.RED)
+					.build());
+
+			return super.render(graphics);
+		}
+
 		panelComponent.getChildren().add(TitleComponent.builder()
 				.text(displayLayout)
 				.color(color)
@@ -205,20 +247,23 @@ public class CoxScouterExternalOverlay extends OverlayPanel
 			switch (room.getType())
 			{
 				case COMBAT:
-					if (plugin.getRoomWhitelist().contains(room.getName().toLowerCase()))
-					{
-						color = Color.GREEN;
-					}
-					else if (plugin.getRoomBlacklist().contains(room.getName().toLowerCase())
-							|| configManager.getConfiguration("raids", "enableRotationWhitelist", Boolean.class) && !plugin.getRotationMatches())
-					{
-						color = Color.RED;
-					}
-
 					String bossName = room == RaidRoom.UNKNOWN_COMBAT ? "Unknown" : room.getName();
 					String bossNameLC = bossName.toLowerCase();
 					if (config.showRecommendedItems() && plugin.getRecommendedItemsList().get(bossNameLC) != null)
 						imageIds.addAll(plugin.getRecommendedItemsList().get(bossNameLC));
+					if (plugin.getRoomHighlightedList().contains(bossNameLC))
+					{
+						color = config.highlightColor();
+					}
+					else if (plugin.getRoomWhitelist().contains(bossNameLC))
+					{
+						color = Color.GREEN;
+					}
+					else if (plugin.getRoomBlacklist().contains(bossNameLC)
+							|| configManager.getConfiguration("raids", "enableRotationWhitelist", Boolean.class) && !plugin.getRotationMatches())
+					{
+						color = Color.RED;
+					}
 
 					panelComponent.getChildren().add(LineComponent.builder()
 							.left(config.showRecommendedItems() ? "" : room.getType().getName())
@@ -233,7 +278,11 @@ public class CoxScouterExternalOverlay extends OverlayPanel
 					String puzzleNameLC = puzzleName.toLowerCase();
 					if (config.showRecommendedItems() && plugin.getRecommendedItemsList().get(puzzleNameLC) != null)
 						imageIds.addAll(plugin.getRecommendedItemsList().get(puzzleNameLC));
-					if (plugin.getRoomWhitelist().contains(puzzleNameLC))
+					if (plugin.getRoomHighlightedList().contains(puzzleNameLC))
+					{
+						color = config.highlightColor();
+					}
+					else if (plugin.getRoomWhitelist().contains(puzzleNameLC))
 					{
 						color = Color.GREEN;
 					}

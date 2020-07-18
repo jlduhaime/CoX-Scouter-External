@@ -29,6 +29,8 @@ import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.Keybind;
 
+import java.awt.Color;
+
 @ConfigGroup("coxscouterexternal")
 public interface CoxScouterExternalConfig extends Config
 {
@@ -85,5 +87,49 @@ public interface CoxScouterExternalConfig extends Config
 	default String recommendedItems()
 	{
 		return "";
+	}
+
+	@ConfigItem(
+		position = 6,
+		keyName = "highlightedRooms",
+		name = "Highlighted rooms",
+		description = "Display highlighted rooms in a different color on the overlay. Separate with comma (full name)"
+	)
+	default String highlightedRooms()
+	{
+		return "";
+	}
+
+	@ConfigItem(
+		position = 7,
+		keyName = "highlightColor",
+		name = "Highlight color",
+		description = "The color of highlighted rooms"
+	)
+	default Color highlightColor()
+	{
+		return Color.MAGENTA;
+	}
+
+	@ConfigItem(
+		position = 8,
+		keyName = "hideBlacklist",
+		name = "Hide raids with blacklisted",
+		description = "Completely hides raids containing blacklisted room(s)"
+	)
+	default boolean hideBlacklisted()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+		position = 9,
+		keyName = "hideMissingHighlighted",
+		name = "Hide raids missing highlighted",
+		description = "Completely hides raids missing highlighted room(s)"
+	)
+	default boolean hideMissingHighlighted()
+	{
+		return false;
 	}
 }
