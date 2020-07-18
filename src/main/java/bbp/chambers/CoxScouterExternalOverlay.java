@@ -98,13 +98,23 @@ public class CoxScouterExternalOverlay extends OverlayPanel
 		Color color = Color.WHITE;
 		String layout = plugin.getRaid().getLayout().toCodeString();
 
+		String displayLayout;
+		if (config.displayFloorBreak())
+		{
+			displayLayout = plugin.getRaid().getLayout().toCode();
+			displayLayout = displayLayout.substring(0, displayLayout.length() - 1).replaceAll("#", "").replaceFirst("¤", " | ");
+		}
+		else
+		{
+			displayLayout = layout;
+		}
 		if (configManager.getConfiguration("raids", "enableLayoutWhitelist", Boolean.class) && !plugin.getLayoutWhitelist().contains(layout.toLowerCase()))
 		{
 			color = Color.RED;
 		}
 
 		panelComponent.getChildren().add(TitleComponent.builder()
-				.text(layout)
+				.text(displayLayout)
 				.color(color)
 				.build());
 

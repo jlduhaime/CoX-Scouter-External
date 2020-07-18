@@ -40,4 +40,14 @@ public interface CoxScouterExternalConfig extends Config
 	{
 		return true;
 	}
+
+	@ConfigItem(
+		keyName = "displayFloorBreak",
+		name = "Layout floor break",
+		description = "Displays floor break in layout"
+	)
+	default boolean displayFloorBreak()
+	{
+		return false;
+	}
 }
