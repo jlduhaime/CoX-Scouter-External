@@ -85,8 +85,6 @@ public class CoxScouterExternalOverlay extends OverlayPanel
 
 	@Getter
 	private boolean scoutOverlayShown = false;
-	private int width;
-	private int height;
 
 	@Inject
 	private WorldService worldService;
@@ -299,21 +297,19 @@ public class CoxScouterExternalOverlay extends OverlayPanel
 
 		//add recommended items
 		Dimension panelDims = super.render(graphics);
-		width = (int) panelDims.getWidth();
-		height = (int) panelDims.getHeight();
 		if (config.showRecommendedItems() && imageIds.size() > 0)
 		{
 			panelImages.getChildren().clear();
 			Integer[] idArray = imageIds.toArray(new Integer[0]);
 			int imagesVerticalOffset = TITLE_COMPONENT_HEIGHT + (configManager.getConfiguration("raids", "ccDisplay", Boolean.class) ? LINE_COMPONENT_HEIGHT : 0) - BORDER_OFFSET;
-			int imagesMaxHeight = height - BORDER_OFFSET - imagesVerticalOffset;
+			int imagesMaxHeight = (int) panelDims.getHeight() - BORDER_OFFSET - imagesVerticalOffset;
 			boolean smallImages = false;
 
 			panelImages.setPreferredLocation(new Point(0, imagesVerticalOffset));
 			panelImages.setBackgroundColor(null);
 			panelImages.setWrap(true);
 			panelImages.setPreferredSize(new Dimension(2 * ICON_SIZE, 0));
-			if (2 * imagesMaxHeight / ICON_SIZE < idArray.length) //TODO
+			if (2 * imagesMaxHeight / ICON_SIZE < idArray.length)
 			{
 				smallImages = true;
 				panelImages.setPreferredSize(new Dimension(3 * SMALL_ICON_SIZE, 0));
@@ -331,8 +327,7 @@ public class CoxScouterExternalOverlay extends OverlayPanel
 
 			panelImages.render(graphics);
 		}
-		//return super.render(graphics);
-		return panelDims; //TODO
+		return panelDims;
 	}
 
 	private BufferedImage getImage(int id, boolean small)

@@ -196,7 +196,6 @@ public class CoxScouterExternalPlugin extends Plugin
 	public void onRaidScouted(RaidScouted raidScouted)
 	{
 		this.raid = raidScouted.getRaid();
-		//raidScouted.isFirstScout();
 	}
 
 	@Subscribe
@@ -456,7 +455,6 @@ public class CoxScouterExternalPlugin extends Plugin
 	{
 		if (raid == null
 				|| raid.getLayout() == null
-				|| "raids" == null
 				|| !config.scoutOverlay())
 		{
 			return false;
