@@ -36,11 +36,12 @@ import net.runelite.api.Client;
 import static net.runelite.api.MenuAction.RUNELITE_OVERLAY;
 import static net.runelite.api.MenuAction.RUNELITE_OVERLAY_CONFIG;
 import net.runelite.api.Varbits;
+import net.runelite.client.config.ConfigManager;
 import net.runelite.client.game.WorldService;
 import static net.runelite.client.ui.overlay.OverlayManager.OPTION_CONFIGURE;
 
-import net.runelite.client.plugins.raids.RaidsConfig;
-import net.runelite.client.plugins.raids.RaidsPlugin;
+import net.runelite.client.plugins.raids.RaidRoom;
+import net.runelite.client.plugins.raids.solver.Room;
 import net.runelite.client.ui.overlay.OverlayMenuEntry;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
@@ -59,8 +60,6 @@ public class CoxScouterExternalOverlay extends OverlayPanel
 	static final String SCREENSHOT_ACTION = "Screenshot";
 
 	private Client client;
-	private RaidsPlugin raidsPlugin;
-	private RaidsConfig raidsConfig;
 	private CoxScouterExternalPlugin plugin;
 	private CoxScouterExternalConfig config;
 
@@ -71,13 +70,14 @@ public class CoxScouterExternalOverlay extends OverlayPanel
 	private WorldService worldService;
 
 	@Inject
-	private CoxScouterExternalOverlay(Client client, RaidsPlugin raidsPlugin, RaidsConfig raidsConfig, CoxScouterExternalPlugin plugin, CoxScouterExternalConfig config)
+	private ConfigManager configManager;
+
+	@Inject
+	private CoxScouterExternalOverlay(Client client, CoxScouterExternalPlugin plugin, CoxScouterExternalConfig config)
 	{
 		super(plugin);
 		setPosition(OverlayPosition.TOP_LEFT);
 		setPriority(OverlayPriority.LOW);
-		this.raidsPlugin = raidsPlugin;
-		this.raidsConfig = raidsConfig;
 		this.client = client;
 		this.plugin = plugin;
 		this.config = config;
@@ -98,7 +98,7 @@ public class CoxScouterExternalOverlay extends OverlayPanel
 		Color color = Color.WHITE;
 		String layout = plugin.getRaid().getLayout().toCodeString();
 
-		if (config.enableLayoutWhitelist() && !plugin.getLayoutWhitelist().contains(layout.toLowerCase()))
+		if (configManager.getConfiguration("raids", "enableLayoutWhitelist", Boolean.class) && !plugin.getLayoutWhitelist().contains(layout.toLowerCase()))
 		{
 			color = Color.RED;
 		}
@@ -108,7 +108,7 @@ public class CoxScouterExternalOverlay extends OverlayPanel
 				.color(color)
 				.build());
 
-		if (config.fcDisplay())
+		if (configManager.getConfiguration("raids", "ccDisplay", Boolean.class))
 		{
 			color = Color.RED;
 			FriendsChatManager friendsChatManager = client.getFriendsChatManager();
@@ -163,7 +163,7 @@ public class CoxScouterExternalOverlay extends OverlayPanel
 						color = Color.GREEN;
 					}
 					else if (plugin.getRoomBlacklist().contains(room.getName().toLowerCase())
-							|| config.enableRotationWhitelist() && !plugin.getRotationMatches())
+							|| configManager.getConfiguration("raids", "enableRotationWhitelist", Boolean.class) && !plugin.getRotationMatches())
 					{
 						color = Color.RED;
 					}
@@ -206,6 +206,7 @@ public class CoxScouterExternalOverlay extends OverlayPanel
 	{
 		if (plugin.getRaid() == null
 				|| plugin.getRaid().getLayout() == null
+				|| "raids" == null
 				|| !config.scoutOverlay())
 		{
 			return false;
@@ -221,7 +222,7 @@ public class CoxScouterExternalOverlay extends OverlayPanel
 					return false;
 				}
 
-				return config.scoutOverlayInRaid();
+				return configManager.getConfiguration("raids", "scoutOverlayInRaid", Boolean.class);
 			}
 			else
 			{
@@ -229,6 +230,6 @@ public class CoxScouterExternalOverlay extends OverlayPanel
 			}
 		}
 
-		return plugin.getRaidPartyID() != -1 && config.scoutOverlayAtBank();
+		return plugin.getRaidPartyID() != -1 && configManager.getConfiguration("raids", "scoutOverlayAtBank", Boolean.class);
 	}
 }

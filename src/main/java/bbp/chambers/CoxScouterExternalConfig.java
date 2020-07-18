@@ -32,12 +32,12 @@ import net.runelite.client.config.ConfigItem;
 public interface CoxScouterExternalConfig extends Config
 {
 	@ConfigItem(
-		keyName = "greeting",
-		name = "Welcome Greeting",
-		description = "The message to show to the user when they login"
+		keyName = "scoutOverlay",
+		name = "Show scout overlay",
+		description = "Display an overlay that shows the current raid layout (when entering lobby)"
 	)
-	default String greeting()
+	default boolean scoutOverlay()
 	{
-		return "Hello";
+		return true;
 	}
 }
