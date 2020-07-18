@@ -30,11 +30,21 @@ import com.google.inject.Provides;
 import javax.inject.Inject;
 
 import lombok.Getter;
+import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
+import net.runelite.api.MenuAction;
 import net.runelite.api.VarPlayer;
 import net.runelite.api.Varbits;
 import net.runelite.api.events.VarbitChanged;
+import net.runelite.client.chat.ChatColorType;
+import net.runelite.client.chat.ChatMessageBuilder;
+import net.runelite.client.chat.ChatMessageManager;
+import net.runelite.client.chat.QueuedMessage;
+import net.runelite.client.config.Keybind;
+import net.runelite.client.config.RuneLiteConfig;
 import net.runelite.client.events.ConfigChanged;
+import net.runelite.client.events.OverlayMenuClicked;
+import net.runelite.client.input.KeyManager;
 import net.runelite.client.plugins.raids.Raid;
 import net.runelite.client.plugins.raids.RaidRoom;
 import net.runelite.client.plugins.raids.RoomType;
@@ -46,8 +56,19 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.raids.solver.Room;
 import net.runelite.client.ui.overlay.OverlayManager;
+import net.runelite.client.util.HotkeyListener;
+import net.runelite.client.util.ImageCapture;
+import net.runelite.client.util.ImageUploadStyle;
 import net.runelite.client.util.Text;
+import net.runelite.client.ws.PartyMember;
+import net.runelite.client.ws.PartyService;
+import net.runelite.client.ws.WSClient;
+import net.runelite.http.api.ws.messages.party.PartyChatMessage;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -68,6 +89,12 @@ public class CoxScouterExternalPlugin extends Plugin
 	private Client client;
 
 	@Inject
+	private RuneLiteConfig runeLiteConfig;
+
+	@Inject
+	private ImageCapture imageCapture;
+
+	@Inject
 	private CoxScouterExternalConfig config;
 
 	@Inject
@@ -78,6 +105,18 @@ public class CoxScouterExternalPlugin extends Plugin
 
 	@Inject
 	private CoxScouterExternalOverlay overlay;
+
+	@Inject
+	private PartyService party;
+
+	@Inject
+	private WSClient ws;
+
+	@Inject
+	private ChatMessageManager chatMessageManager;
+
+	@Inject
+	private KeyManager keyManager;
 
 	@Getter
 	private final Set<String> roomWhitelist = new HashSet<String>();
@@ -103,6 +142,7 @@ public class CoxScouterExternalPlugin extends Plugin
 	{
 		overlayManager.add(overlay);
 		updateLists();
+		keyManager.registerKeyListener(screenshotHotkeyListener);
 	}
 
 	@Override
@@ -110,6 +150,7 @@ public class CoxScouterExternalPlugin extends Plugin
 	{
 		overlayManager.remove(overlay);
 		inRaidChambers = false;
+		keyManager.unregisterKeyListener(screenshotHotkeyListener);
 	}
 
 	@Subscribe
@@ -134,6 +175,25 @@ public class CoxScouterExternalPlugin extends Plugin
 	public void onRaidReset(RaidReset raidReset)
 	{
 		this.raid = null;
+	}
+
+	@Subscribe
+	public void onOverlayMenuClicked(final OverlayMenuClicked event)
+	{
+		if (!(event.getEntry().getMenuAction() == MenuAction.RUNELITE_OVERLAY
+				&& event.getOverlay() == overlay))
+		{
+			return;
+		}
+
+		if (event.getEntry().getOption().equals(CoxScouterExternalOverlay.BROADCAST_ACTION))
+		{
+			sendRaidLayoutMessage();
+		}
+		else if (event.getEntry().getOption().equals(CoxScouterExternalOverlay.SCREENSHOT_ACTION))
+		{
+			screenshotScoutOverlay();
+		}
 	}
 
 	@Subscribe
@@ -223,4 +283,100 @@ public class CoxScouterExternalPlugin extends Plugin
 
 		return combatRooms.toArray(new RaidRoom[0]);
 	}
+
+	private void sendRaidLayoutMessage()
+	{
+		final String layout = getRaid().getLayout().toCodeString();
+		final String rooms = toRoomString(getRaid());
+		final String raidData = "[" + layout + "]: " + rooms;
+
+		final String layoutMessage = new ChatMessageBuilder()
+				.append(ChatColorType.HIGHLIGHT)
+				.append("Layout: ")
+				.append(ChatColorType.NORMAL)
+				.append(raidData)
+				.build();
+
+		final PartyMember localMember = party.getLocalMember();
+
+		if (party.getMembers().isEmpty() || localMember == null)
+		{
+			chatMessageManager.queue(QueuedMessage.builder()
+					.type(ChatMessageType.FRIENDSCHATNOTIFICATION)
+					.runeLiteFormattedMessage(layoutMessage)
+					.build());
+		}
+		else
+		{
+			final PartyChatMessage message = new PartyChatMessage(layoutMessage);
+			message.setMemberId(localMember.getMemberId());
+			ws.send(message);
+		}
+	}
+
+	String toRoomString(Raid raid)
+	{
+		final StringBuilder sb = new StringBuilder();
+
+		for (RaidRoom room : getOrderedRooms(raid))
+		{
+			switch (room.getType())
+			{
+				case PUZZLE:
+				case COMBAT:
+					sb.append(room.getName()).append(", ");
+					break;
+			}
+		}
+
+		final String roomsString = sb.toString();
+		return roomsString.substring(0, roomsString.length() - 2);
+	}
+
+	List<RaidRoom> getOrderedRooms(Raid raid)
+	{
+		List<RaidRoom> orderedRooms = new ArrayList<>();
+		for (Room r : raid.getLayout().getRooms())
+		{
+			final int position = r.getPosition();
+			final RaidRoom room = raid.getRoom(position);
+
+			if (room == null)
+			{
+				continue;
+			}
+
+			orderedRooms.add(room);
+		}
+
+		return orderedRooms;
+	}
+
+	private void screenshotScoutOverlay()
+	{
+		if (!overlay.isScoutOverlayShown())
+		{
+			return;
+		}
+
+		Rectangle overlayDimensions = overlay.getBounds();
+		BufferedImage overlayImage = new BufferedImage(overlayDimensions.width, overlayDimensions.height, BufferedImage.TYPE_INT_ARGB);
+		Graphics2D graphic = overlayImage.createGraphics();
+		graphic.setFont(runeLiteConfig.interfaceFontType().getFont());
+		graphic.setColor(Color.BLACK);
+		graphic.fillRect(0, 0, overlayDimensions.width, overlayDimensions.height);
+		overlay.render(graphic);
+
+		imageCapture.takeScreenshot(overlayImage, "CoX_scout-", false, configManager.getConfiguration("raids", "uploadScreenshot", ImageUploadStyle.class));
+		graphic.dispose();
+	}
+
+	private final HotkeyListener screenshotHotkeyListener = new HotkeyListener(() -> config.screenshotHotkey())
+	{
+		@Override
+		public void hotkeyPressed()
+		{
+			screenshotScoutOverlay();
+		}
+	};
 }

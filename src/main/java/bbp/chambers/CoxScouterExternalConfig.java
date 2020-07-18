@@ -27,11 +27,13 @@ package bbp.chambers;
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
+import net.runelite.client.config.Keybind;
 
 @ConfigGroup("coxscouterexternal")
 public interface CoxScouterExternalConfig extends Config
 {
 	@ConfigItem(
+		position = 1,
 		keyName = "scoutOverlay",
 		name = "Show scout overlay",
 		description = "Display an overlay that shows the current raid layout (when entering lobby)"
@@ -49,5 +51,15 @@ public interface CoxScouterExternalConfig extends Config
 	default boolean displayFloorBreak()
 	{
 		return false;
+	}
+
+	@ConfigItem(
+		keyName = "screenshotHotkey",
+		name = "Scouter screenshot hotkey",
+		description = "Hotkey used to screenshot the scouting overlay"
+	)
+	default Keybind screenshotHotkey()
+	{
+		return Keybind.NOT_SET;
 	}
 }
