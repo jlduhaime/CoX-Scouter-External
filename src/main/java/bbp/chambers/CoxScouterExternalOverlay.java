@@ -334,7 +334,8 @@ public class CoxScouterExternalOverlay extends OverlayPanel
 
 			panelImages.render(graphics);
 		}
-		return super.render(graphics);
+		//return super.render(graphics);
+		return panelDims;
 	}
 
 	private boolean shouldShowOverlay()
