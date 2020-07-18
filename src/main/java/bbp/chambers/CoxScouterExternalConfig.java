@@ -44,6 +44,7 @@ public interface CoxScouterExternalConfig extends Config
 	}
 
 	@ConfigItem(
+		position = 2,
 		keyName = "displayFloorBreak",
 		name = "Layout floor break",
 		description = "Displays floor break in layout"
@@ -54,6 +55,7 @@ public interface CoxScouterExternalConfig extends Config
 	}
 
 	@ConfigItem(
+		position = 3,
 		keyName = "screenshotHotkey",
 		name = "Scouter screenshot hotkey",
 		description = "Hotkey used to screenshot the scouting overlay"
@@ -61,5 +63,27 @@ public interface CoxScouterExternalConfig extends Config
 	default Keybind screenshotHotkey()
 	{
 		return Keybind.NOT_SET;
+	}
+
+	@ConfigItem(
+		position = 4,
+		keyName = "showRecommendedItems",
+		name = "Show recommended items",
+		description = "Adds overlay with recommended items to scouter"
+	)
+	default boolean showRecommendedItems()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+		position = 5,
+		keyName = "recommendedItems",
+		name = "Recommended items",
+		description = "User-set recommended items in the form: [muttadiles,ice barrage,zamorak godsword],[tekton,elder maul], ..."
+	)
+	default String recommendedItems()
+	{
+		return "";
 	}
 }

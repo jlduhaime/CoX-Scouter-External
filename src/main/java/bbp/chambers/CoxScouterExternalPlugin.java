@@ -30,9 +30,12 @@ import com.google.inject.Provides;
 import javax.inject.Inject;
 
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
+import net.runelite.api.ItemID;
 import net.runelite.api.MenuAction;
+import net.runelite.api.SpriteID;
 import net.runelite.api.VarPlayer;
 import net.runelite.api.Varbits;
 import net.runelite.api.events.VarbitChanged;
@@ -44,6 +47,7 @@ import net.runelite.client.config.Keybind;
 import net.runelite.client.config.RuneLiteConfig;
 import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.events.OverlayMenuClicked;
+import net.runelite.client.game.ItemManager;
 import net.runelite.client.input.KeyManager;
 import net.runelite.client.plugins.raids.Raid;
 import net.runelite.client.plugins.raids.RaidRoom;
@@ -72,11 +76,16 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+@Slf4j
 @PluginDescriptor(
 	name = "CoX Scouter External"
 )
@@ -107,6 +116,9 @@ public class CoxScouterExternalPlugin extends Plugin
 	private CoxScouterExternalOverlay overlay;
 
 	@Inject
+	private ItemManager itemManager;
+
+	@Inject
 	private PartyService party;
 
 	@Inject
@@ -131,11 +143,15 @@ public class CoxScouterExternalPlugin extends Plugin
 	private final Set<String> layoutWhitelist = new HashSet<String>();
 
 	@Getter
+	private final Map<String, List<Integer>> recommendedItemsList = new HashMap<>();
+
+	@Getter
 	private int raidPartyID;
 
 	// if the player is inside of a raid or not
 	@Getter
 	private boolean inRaidChambers;
+	private static final Pattern ROTATION_REGEX = Pattern.compile("\\[(.*?)]");
 
 	@Override
 	protected void startUp() throws Exception
@@ -227,6 +243,7 @@ public class CoxScouterExternalPlugin extends Plugin
 		updateList(roomWhitelist, configManager.getConfiguration("raids", "whitelistedRooms"));
 		updateList(roomBlacklist, configManager.getConfiguration("raids", "blacklistedRooms"));
 		updateList(layoutWhitelist, configManager.getConfiguration("raids", "whitelistedLayouts"));
+		updateMap(recommendedItemsList, config.recommendedItems());
 
 		// Update rotation whitelist
 		rotationWhitelist.clear();
@@ -249,6 +266,42 @@ public class CoxScouterExternalPlugin extends Plugin
 			else
 			{
 				list.add(s);
+			}
+		}
+	}
+
+	private void updateMap(Map<String, List<Integer>> map, String input)
+	{
+		map.clear();
+
+		Matcher m = ROTATION_REGEX.matcher(input);
+		while (m.find())
+		{
+			String everything = m.group(1).toLowerCase();
+			int split = everything.indexOf(',');
+			if (split < 0)
+				continue;
+			String key = everything.substring(0, split);
+			if (key.length() < 1)
+				continue;
+			List<String> itemNames = Text.fromCSV(everything.substring(split));
+
+			map.computeIfAbsent(key, k -> new ArrayList<>());
+
+			for (String itemName : itemNames)
+			{
+				if (itemName.equals(""))
+					continue;
+				if (itemName.equals("ice barrage"))
+					map.get(key).add(SpriteID.SPELL_ICE_BARRAGE);
+				else if (itemName.startsWith("salve"))
+					map.get(key).add(ItemID.SALVE_AMULETEI);
+				else if (itemName.contains("blowpipe"))
+					map.get(key).add(ItemID.TOXIC_BLOWPIPE);
+				else if (itemManager.search(itemName).size() > 0)
+					map.get(key).add(itemManager.search(itemName).get(0).getId());
+				else
+					log.info("RaidsPlugin: Could not find an item ID for item: " + itemName);
 			}
 		}
 	}
