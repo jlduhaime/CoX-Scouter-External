@@ -35,6 +35,17 @@ import java.awt.Color;
 public interface CoxScouterExternalConfig extends Config
 {
 	@ConfigItem(
+			position = 0,
+			keyName = "showTutorialOverlay",
+			name = "Show tutorial overlay",
+			description = "Whether to show an overlay to help understand how to use the plugin"
+	)
+	default boolean showTutorialOverlay()
+	{
+		return true;
+	}
+
+	@ConfigItem(
 		position = 1,
 		keyName = "scoutOverlay",
 		name = "Show scout overlay",

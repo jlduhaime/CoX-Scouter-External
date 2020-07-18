@@ -38,6 +38,7 @@ import net.runelite.api.MenuAction;
 import net.runelite.api.SpriteID;
 import net.runelite.api.VarPlayer;
 import net.runelite.api.Varbits;
+import net.runelite.api.events.GameTick;
 import net.runelite.api.events.VarbitChanged;
 import net.runelite.client.chat.ChatColorType;
 import net.runelite.client.chat.ChatMessageBuilder;
@@ -115,6 +116,9 @@ public class CoxScouterExternalPlugin extends Plugin
 	private CoxScouterExternalOverlay overlay;
 
 	@Inject
+	private CoxScouterExternalTutorialOverlay tutorialOverlay;
+
+	@Inject
 	private ItemManager itemManager;
 
 	@Inject
@@ -150,15 +154,20 @@ public class CoxScouterExternalPlugin extends Plugin
 	@Getter
 	private int raidPartyID;
 
+	@Getter
+	private boolean shouldShowOverlays = false;
+
 	// if the player is inside of a raid or not
 	@Getter
 	private boolean inRaidChambers;
 	private static final Pattern ROTATION_REGEX = Pattern.compile("\\[(.*?)]");
+	private static final int OLM_PLANE = 0;
 
 	@Override
 	protected void startUp() throws Exception
 	{
 		overlayManager.add(overlay);
+		overlayManager.add(tutorialOverlay);
 		updateLists();
 		keyManager.registerKeyListener(screenshotHotkeyListener);
 	}
@@ -167,6 +176,7 @@ public class CoxScouterExternalPlugin extends Plugin
 	protected void shutDown() throws Exception
 	{
 		overlayManager.remove(overlay);
+		overlayManager.remove(tutorialOverlay);
 		inRaidChambers = false;
 		keyManager.unregisterKeyListener(screenshotHotkeyListener);
 	}
@@ -231,6 +241,12 @@ public class CoxScouterExternalPlugin extends Plugin
 		{
 			inRaidChambers = tempInRaid;
 		}
+	}
+
+	@Subscribe
+	public void onGameTick(GameTick gameTick)
+	{
+		shouldShowOverlays = shouldShowOverlays();
 	}
 
 	@Provides
@@ -435,4 +451,35 @@ public class CoxScouterExternalPlugin extends Plugin
 			screenshotScoutOverlay();
 		}
 	};
+
+	private boolean shouldShowOverlays()
+	{
+		if (raid == null
+				|| raid.getLayout() == null
+				|| "raids" == null
+				|| !config.scoutOverlay())
+		{
+			return false;
+		}
+
+		if (isInRaidChambers())
+		{
+			// If the raid has started
+			if (client.getVar(Varbits.RAID_STATE) > 0)
+			{
+				if (client.getPlane() == OLM_PLANE)
+				{
+					return false;
+				}
+
+				return configManager.getConfiguration("raids", "scoutOverlayInRaid", Boolean.class);
+			}
+			else
+			{
+				return true;
+			}
+		}
+
+		return getRaidPartyID() != -1 && configManager.getConfiguration("raids", "scoutOverlayAtBank", Boolean.class);
+	}
 }

@@ -41,7 +41,6 @@ import static net.runelite.api.MenuAction.RUNELITE_OVERLAY;
 import static net.runelite.api.MenuAction.RUNELITE_OVERLAY_CONFIG;
 
 import net.runelite.api.SpriteID;
-import net.runelite.api.Varbits;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.game.SpriteManager;
@@ -67,7 +66,6 @@ import net.runelite.http.api.worlds.WorldResult;
 
 public class CoxScouterExternalOverlay extends OverlayPanel
 {
-	private static final int OLM_PLANE = 0;
 	static final String BROADCAST_ACTION = "Broadcast layout";
 	static final String SCREENSHOT_ACTION = "Screenshot";
 	private static final int BORDER_OFFSET = 2;
@@ -115,8 +113,7 @@ public class CoxScouterExternalOverlay extends OverlayPanel
 	@Override
 	public Dimension render(Graphics2D graphics)
 	{
-		scoutOverlayShown = shouldShowOverlay();
-		if (!scoutOverlayShown)
+		if (!plugin.isShouldShowOverlays())
 		{
 			return null;
 		}
@@ -316,7 +313,7 @@ public class CoxScouterExternalOverlay extends OverlayPanel
 			panelImages.setBackgroundColor(null);
 			panelImages.setWrap(true);
 			panelImages.setPreferredSize(new Dimension(2 * ICON_SIZE, 0));
-			if (2 * imagesMaxHeight / ICON_SIZE < idArray.length)
+			if (2 * imagesMaxHeight / ICON_SIZE < idArray.length) //TODO
 			{
 				smallImages = true;
 				panelImages.setPreferredSize(new Dimension(3 * SMALL_ICON_SIZE, 0));
@@ -335,38 +332,7 @@ public class CoxScouterExternalOverlay extends OverlayPanel
 			panelImages.render(graphics);
 		}
 		//return super.render(graphics);
-		return panelDims;
-	}
-
-	private boolean shouldShowOverlay()
-	{
-		if (plugin.getRaid() == null
-				|| plugin.getRaid().getLayout() == null
-				|| "raids" == null
-				|| !config.scoutOverlay())
-		{
-			return false;
-		}
-
-		if (plugin.isInRaidChambers())
-		{
-			// If the raid has started
-			if (client.getVar(Varbits.RAID_STATE) > 0)
-			{
-				if (client.getPlane() == OLM_PLANE)
-				{
-					return false;
-				}
-
-				return configManager.getConfiguration("raids", "scoutOverlayInRaid", Boolean.class);
-			}
-			else
-			{
-				return true;
-			}
-		}
-
-		return plugin.getRaidPartyID() != -1 && configManager.getConfiguration("raids", "scoutOverlayAtBank", Boolean.class);
+		return panelDims; //TODO
 	}
 
 	private BufferedImage getImage(int id, boolean small)
