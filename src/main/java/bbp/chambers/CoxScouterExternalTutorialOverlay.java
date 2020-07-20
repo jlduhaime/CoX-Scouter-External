@@ -57,7 +57,7 @@ public class CoxScouterExternalTutorialOverlay extends OverlayPanel
 		line4 = LineComponent.builder().left("You can turn off this tutorial overlay: CoX External -> disable Show tutorial overlay.").build();
 
 		setPriority(OverlayPriority.LOW);
-		setPosition(OverlayPosition.TOP_LEFT);
+		setPosition(OverlayPosition.TOP_RIGHT);
 	}
 
 	@Override

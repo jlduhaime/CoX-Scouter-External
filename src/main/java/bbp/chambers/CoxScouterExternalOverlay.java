@@ -243,7 +243,7 @@ public class CoxScouterExternalOverlay extends OverlayPanel
 			{
 				case COMBAT:
 					String bossName = room == RaidRoom.UNKNOWN_COMBAT ? "Unknown" : room.getName();
-					String bossNameLC = bossName.toLowerCase();
+					String bossNameLC = room.getName().toLowerCase();
 					if (config.showRecommendedItems() && plugin.getRecommendedItemsList().get(bossNameLC) != null)
 						imageIds.addAll(plugin.getRecommendedItemsList().get(bossNameLC));
 					if (plugin.getRoomHighlightedList().contains(bossNameLC))
@@ -270,7 +270,7 @@ public class CoxScouterExternalOverlay extends OverlayPanel
 
 				case PUZZLE:
 					String puzzleName = room == RaidRoom.UNKNOWN_PUZZLE ? "Unknown" : room.getName();
-					String puzzleNameLC = puzzleName.toLowerCase();
+					String puzzleNameLC = room.getName().toLowerCase();
 					if (config.showRecommendedItems() && plugin.getRecommendedItemsList().get(puzzleNameLC) != null)
 						imageIds.addAll(plugin.getRecommendedItemsList().get(puzzleNameLC));
 					if (plugin.getRoomHighlightedList().contains(puzzleNameLC))

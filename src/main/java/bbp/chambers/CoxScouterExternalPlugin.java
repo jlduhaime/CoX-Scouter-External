@@ -87,7 +87,8 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @PluginDescriptor(
-	name = "CoX Scouter External"
+	name = "CoX Scouter External",
+	tags = {"combat", "overlay", "pve", "pvm", "bosses", "chambers", "xeric", "raids"}
 )
 public class CoxScouterExternalPlugin extends Plugin
 {
@@ -265,14 +266,22 @@ public class CoxScouterExternalPlugin extends Plugin
 
 		// Update rotation whitelist
 		rotationWhitelist.clear();
-		for (String line : configManager.getConfiguration("raids", "whitelistedRotations").split("\\n"))
+		if (configManager.getConfiguration("raids", "whitelistedRotations") != null)
 		{
-			rotationWhitelist.add(line.toLowerCase().replace(" ", ""));
+			for (String line : configManager.getConfiguration("raids", "whitelistedRotations").split("\\n"))
+			{
+				rotationWhitelist.add(line.toLowerCase().replace(" ", ""));
+			}
 		}
 	}
 
 	private void updateList(Collection<String> list, String input)
 	{
+		if (input == null)
+		{
+			return;
+		}
+
 		list.clear();
 		for (String s : Text.fromCSV(input.toLowerCase()))
 		{
