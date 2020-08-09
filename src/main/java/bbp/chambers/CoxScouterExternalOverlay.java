@@ -34,7 +34,6 @@ import java.awt.image.BufferedImage;
 import java.util.HashSet;
 import java.util.Set;
 import javax.inject.Inject;
-import lombok.Getter;
 import net.runelite.api.FriendsChatManager;
 import net.runelite.api.Client;
 import static net.runelite.api.MenuAction.RUNELITE_OVERLAY;
@@ -83,9 +82,6 @@ public class CoxScouterExternalOverlay extends OverlayPanel
 	private final SpriteManager spriteManager;
 	private final PanelComponent panelImages = new PanelComponent();
 
-	@Getter
-	private boolean scoutOverlayShown = false;
-
 	@Inject
 	private WorldService worldService;
 
@@ -111,6 +107,7 @@ public class CoxScouterExternalOverlay extends OverlayPanel
 	@Override
 	public Dimension render(Graphics2D graphics)
 	{
+		plugin.shouldShowOverlays();
 		if (!plugin.isShouldShowOverlays())
 		{
 			return null;
@@ -219,7 +216,7 @@ public class CoxScouterExternalOverlay extends OverlayPanel
 		Set<Integer> imageIds = new HashSet<>();
 		FontMetrics metrics = graphics.getFontMetrics();
 		int roomWidth = 0;
-		int temp = 0;
+		int temp;
 
 		for (Room layoutRoom : plugin.getRaid().getLayout().getRooms())
 		{

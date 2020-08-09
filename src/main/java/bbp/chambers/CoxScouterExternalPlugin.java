@@ -33,6 +33,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
+import net.runelite.api.GameState;
 import net.runelite.api.ItemID;
 import net.runelite.api.MenuAction;
 import net.runelite.api.SpriteID;
@@ -40,6 +41,7 @@ import net.runelite.api.VarPlayer;
 import net.runelite.api.Varbits;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.VarbitChanged;
+import net.runelite.client.callback.ClientThread;
 import net.runelite.client.chat.ChatColorType;
 import net.runelite.client.chat.ChatMessageBuilder;
 import net.runelite.client.chat.ChatMessageManager;
@@ -134,6 +136,9 @@ public class CoxScouterExternalPlugin extends Plugin
 	@Inject
 	private KeyManager keyManager;
 
+	@Inject
+	private ClientThread clientThread;
+
 	@Getter
 	private final Set<String> roomWhitelist = new HashSet<String>();
 
@@ -156,11 +161,12 @@ public class CoxScouterExternalPlugin extends Plugin
 	private int raidPartyID;
 
 	@Getter
-	private boolean shouldShowOverlays = false;
+	private boolean shouldShowOverlays;
 
 	// if the player is inside of a raid or not
 	@Getter
 	private boolean inRaidChambers;
+	private static int raidState;
 	private static final Pattern ROTATION_REGEX = Pattern.compile("\\[(.*?)]");
 	private static final int OLM_PLANE = 0;
 
@@ -170,6 +176,10 @@ public class CoxScouterExternalPlugin extends Plugin
 		overlayManager.add(overlay);
 		overlayManager.add(tutorialOverlay);
 		updateLists();
+		this.clientThread.invokeLater(() ->
+		{
+			this.checkRaidPresence();
+		});
 		keyManager.registerKeyListener(screenshotHotkeyListener);
 	}
 
@@ -227,20 +237,10 @@ public class CoxScouterExternalPlugin extends Plugin
 	@Subscribe
 	public void onVarbitChanged(VarbitChanged event)
 	{
-		int tempPartyID = client.getVar(VarPlayer.IN_RAID_PARTY);
-		boolean tempInRaid = client.getVar(Varbits.IN_RAID) == 1;
-
-		// if the player's party state has changed
-		if (tempPartyID != raidPartyID)
+		this.clientThread.invokeLater(() ->
 		{
-			raidPartyID = tempPartyID;
-		}
-
-		// if the player's raid state has changed
-		if (tempInRaid != inRaidChambers)
-		{
-			inRaidChambers = tempInRaid;
-		}
+			this.checkRaidPresence();
+		});
 	}
 
 	@Subscribe
@@ -256,7 +256,7 @@ public class CoxScouterExternalPlugin extends Plugin
 	}
 
 	@VisibleForTesting
-	void updateLists()
+	private void updateLists()
 	{
 		updateList(roomWhitelist, configManager.getConfiguration("raids", "whitelistedRooms"));
 		updateList(roomBlacklist, configManager.getConfiguration("raids", "blacklistedRooms"));
@@ -344,7 +344,7 @@ public class CoxScouterExternalPlugin extends Plugin
 		return rotationWhitelist.contains(rotation);
 	}
 
-	RaidRoom[] getCombatRooms()
+	private RaidRoom[] getCombatRooms()
 	{
 		List<RaidRoom> combatRooms = new ArrayList<>();
 
@@ -394,7 +394,7 @@ public class CoxScouterExternalPlugin extends Plugin
 		}
 	}
 
-	String toRoomString(Raid raid)
+	private String toRoomString(Raid raid)
 	{
 		final StringBuilder sb = new StringBuilder();
 
@@ -413,7 +413,7 @@ public class CoxScouterExternalPlugin extends Plugin
 		return roomsString.substring(0, roomsString.length() - 2);
 	}
 
-	List<RaidRoom> getOrderedRooms(Raid raid)
+	private List<RaidRoom> getOrderedRooms(Raid raid)
 	{
 		List<RaidRoom> orderedRooms = new ArrayList<>();
 		for (Room r : raid.getLayout().getRooms())
@@ -434,7 +434,7 @@ public class CoxScouterExternalPlugin extends Plugin
 
 	private void screenshotScoutOverlay()
 	{
-		if (!overlay.isScoutOverlayShown())
+		if (!shouldShowOverlays)
 		{
 			return;
 		}
@@ -460,7 +460,7 @@ public class CoxScouterExternalPlugin extends Plugin
 		}
 	};
 
-	private boolean shouldShowOverlays()
+	boolean shouldShowOverlays()
 	{
 		if (raid == null
 				|| raid.getLayout() == null
@@ -472,7 +472,7 @@ public class CoxScouterExternalPlugin extends Plugin
 		if (isInRaidChambers())
 		{
 			// If the raid has started
-			if (client.getVar(Varbits.RAID_STATE) > 0)
+			if (raidState > 0)
 			{
 				if (client.getPlane() == OLM_PLANE)
 				{
@@ -488,5 +488,35 @@ public class CoxScouterExternalPlugin extends Plugin
 		}
 
 		return getRaidPartyID() != -1 && configManager.getConfiguration("raids", "scoutOverlayAtBank", Boolean.class);
+	}
+
+	private void checkRaidPresence()
+	{
+		if (client.getGameState() != GameState.LOGGED_IN)
+		{
+			return;
+		}
+
+		int tempRaidState = client.getVar(Varbits.RAID_STATE);
+		int tempPartyID = client.getVar(VarPlayer.IN_RAID_PARTY);
+		boolean tempInRaid = client.getVar(Varbits.IN_RAID) == 1;
+
+		// if the player's party state has changed
+		if (tempPartyID != raidPartyID)
+		{
+			raidPartyID = tempPartyID;
+		}
+
+		// if the player's raid state has changed
+		if (tempInRaid != inRaidChambers)
+		{
+			inRaidChambers = tempInRaid;
+		}
+
+		// if the player's raid state has changed
+		if (tempRaidState != raidState)
+		{
+			raidState = tempRaidState;
+		}
 	}
 }
