@@ -149,15 +149,33 @@ public class CoxScouterExternalOverlay extends OverlayPanel
 			}
 		}
 
-		if (!hide && config.hideMissingHighlighted())
+		if (!hide)
 		{
-			for (String requiredRoom : plugin.getRoomHighlightedList())
+			if (config.hideMissingHighlighted())
 			{
-				if (!roomNames.contains(requiredRoom))
+				int hCount = 0;
+				for (String requiredRoom : plugin.getRoomHighlightedList())
+				{
+					if (roomNames.contains(requiredRoom))
+					{
+						hCount++;
+					}
+				}
+				if(hCount < config.highlightedShowThreshold())
 				{
 					hide = true;
-					break;
 				}
+			}
+			if (config.hideMissingLayout())
+			{
+				if (configManager.getConfiguration("raids", "enableLayoutWhitelist", Boolean.class) && !plugin.getLayoutWhitelist().contains(layout.toLowerCase()))
+				{
+					hide = true;
+				}
+			}
+			if (config.hideRopeless() && !roomNames.contains("tightrope"))
+			{
+				hide = true;
 			}
 		}
 
