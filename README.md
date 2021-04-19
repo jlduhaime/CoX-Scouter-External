@@ -19,6 +19,10 @@ Adds a customizable(see example config below) list of highlighted rooms. Also ad
 ![hidden scout](https://i.gyazo.com/b4e0be785cff067768ace64972b8739f.png)<br/>
 ![highlght-config](https://i.gyazo.com/c3b330403100e55b1938882f49d353fc.png)
 
+### Advanced scouter hiding:
+Options to hide highlighted with a threshold, missing layouts, and ropeless are also available. As long as the amount of highlighted rooms detected is equal or greater than the threshold, the raid will be shown. The missing layouts option hides a raid if the layout does not match with a layout in the layout whitelist(found in the default plugin settings).<br/>
+![advanced-config](https://i.gyazo.com/eb72bf7da7f68901afe3e47fdc2cb489.png)
+
 ## License
 CoX Scouter External Plugin is licensed under the BSD 2-Clause License. See [LICENSE](https://github.com/Blackberry0Pie/CoX-Scouter-External/blob/master/LICENSE) for details.
 
