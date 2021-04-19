@@ -134,10 +134,10 @@ public interface CoxScouterExternalConfig extends Config
 	}
 
 	@ConfigItem(
-			position = 9,
-			keyName = "highlightedShowThreshold",
-			name = "Show threshold",
-			description = "The number of highlighted rooms needed to show the raid. 0 means no threshold."
+		position = 9,
+		keyName = "highlightedShowThreshold",
+		name = "Show threshold",
+		description = "The number of highlighted rooms needed to show the raid. 0 means no threshold."
 	)
 	default int highlightedShowThreshold()
 	{
@@ -145,10 +145,10 @@ public interface CoxScouterExternalConfig extends Config
 	}
 
 	@ConfigItem(
-			position = 10,
-			keyName = "hideBlacklist",
-			name = "Hide raids with blacklisted",
-			description = "Completely hides raids containing blacklisted room(s)"
+		position = 10,
+		keyName = "hideBlacklist",
+		name = "Hide raids with blacklisted",
+		description = "Completely hides raids containing blacklisted room(s)"
 	)
 	default boolean hideBlacklisted()
 	{
@@ -156,10 +156,10 @@ public interface CoxScouterExternalConfig extends Config
 	}
 
 	@ConfigItem(
-			position = 11,
-			keyName = "hideMissingLayout",
-			name = "Hide missing layout",
-			description = "Completely hides raids missing a whitelisted layout"
+		position = 11,
+		keyName = "hideMissingLayout",
+		name = "Hide missing layout",
+		description = "Completely hides raids missing a whitelisted layout"
 	)
 	default boolean hideMissingLayout()
 	{
@@ -167,10 +167,10 @@ public interface CoxScouterExternalConfig extends Config
 	}
 
 	@ConfigItem(
-			position = 12,
-			keyName = "hideRopeless",
-			name = "Hide ropeless raids",
-			description = "Completely hides raids missing a tightrope"
+		position = 12,
+		keyName = "hideRopeless",
+		name = "Hide ropeless raids",
+		description = "Completely hides raids missing a tightrope"
 	)
 	default boolean hideRopeless()
 	{
