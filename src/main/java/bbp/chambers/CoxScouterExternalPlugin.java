@@ -440,7 +440,7 @@ public class CoxScouterExternalPlugin extends Plugin
 		}
 
 		Rectangle overlayDimensions = overlay.getBounds();
-		BufferedImage overlayImage = new BufferedImage(overlayDimensions.width, overlayDimensions.height, BufferedImage.TYPE_INT_ARGB);
+		BufferedImage overlayImage = new BufferedImage(overlayDimensions.width, overlayDimensions.height, BufferedImage.TYPE_INT_RGB);
 		Graphics2D graphic = overlayImage.createGraphics();
 		graphic.setFont(runeLiteConfig.interfaceFontType().getFont());
 		graphic.setColor(Color.BLACK);
