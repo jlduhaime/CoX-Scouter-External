@@ -70,9 +70,6 @@ public class CoxScouterExternalOverlay extends OverlayPanel
 	private static final int BORDER_OFFSET = 2;
 	private static final int ICON_SIZE = 32;
 	private static final int SMALL_ICON_SIZE = 21;
-	//might need to edit these if they are not standard
-	private static final int TITLE_COMPONENT_HEIGHT = 20;
-	private static final int LINE_COMPONENT_HEIGHT = 16;
 
 	private Client client;
 	private CoxScouterExternalPlugin plugin;
@@ -115,6 +112,7 @@ public class CoxScouterExternalOverlay extends OverlayPanel
 
 		Color color = Color.WHITE;
 		String layout = plugin.getRaid().getLayout().toCodeString();
+		FontMetrics metrics = graphics.getFontMetrics();
 
 		String displayLayout;
 		if (config.displayFloorBreak())
@@ -182,7 +180,6 @@ public class CoxScouterExternalOverlay extends OverlayPanel
 		{
 			color = Color.RED;
 			FriendsChatManager friendsChatManager = client.getFriendsChatManager();
-			FontMetrics metrics = graphics.getFontMetrics();
 
 			String worldString = "W" + client.getWorld();
 			WorldResult worldResult = worldService.getWorlds();
@@ -214,7 +211,6 @@ public class CoxScouterExternalOverlay extends OverlayPanel
 		}
 
 		Set<Integer> imageIds = new HashSet<>();
-		FontMetrics metrics = graphics.getFontMetrics();
 		int roomWidth = 0;
 		int temp;
 
@@ -298,7 +294,8 @@ public class CoxScouterExternalOverlay extends OverlayPanel
 		{
 			panelImages.getChildren().clear();
 			Integer[] idArray = imageIds.toArray(new Integer[0]);
-			int imagesVerticalOffset = TITLE_COMPONENT_HEIGHT + (configManager.getConfiguration("raids", "ccDisplay", Boolean.class) ? LINE_COMPONENT_HEIGHT : 0) - BORDER_OFFSET;
+			int fontHeight = metrics.getHeight();
+			int imagesVerticalOffset = 2 + BORDER_OFFSET + fontHeight + (configManager.getConfiguration("raids", "ccDisplay", Boolean.class) ? fontHeight : 0);
 			int imagesMaxHeight = (int) panelDims.getHeight() - BORDER_OFFSET - imagesVerticalOffset;
 			boolean smallImages = false;
 
@@ -306,7 +303,7 @@ public class CoxScouterExternalOverlay extends OverlayPanel
 			panelImages.setBackgroundColor(null);
 			panelImages.setWrap(true);
 			panelImages.setPreferredSize(new Dimension(2 * ICON_SIZE, 0));
-			if (2 * imagesMaxHeight / ICON_SIZE < idArray.length)
+			if (2 * (imagesMaxHeight / ICON_SIZE) < idArray.length)
 			{
 				smallImages = true;
 				panelImages.setPreferredSize(new Dimension(3 * SMALL_ICON_SIZE, 0));
