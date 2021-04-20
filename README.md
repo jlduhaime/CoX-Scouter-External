@@ -14,7 +14,7 @@ If there are too many items to fit in the overlay, the image size is scaled down
 ![item-overlay-config](https://i.gyazo.com/9a16209e188b6db940b387681eba31da.png)
 
 ### Room highlighting & scouter hiding:
-Adds a customizable(see example config below) list of highlighted rooms. Also adds the option to hide raids that contain any blacklisted rooms, and the option to hide raids missing any highlighted rooms.<br/>
+Adds a customizable(see example config below) list of highlighted rooms. Also adds the option to hide raids that contain any blacklisted rooms, and the option to hide raids missing any highlighted rooms. Selecting white(#FFFFFF) for the highlight color turns off highlight coloring.<br/>
 ![highlighted room](https://i.gyazo.com/f9c664b772a64e1245a5ee08b17bc087.png)
 ![hidden scout](https://i.gyazo.com/b4e0be785cff067768ace64972b8739f.png)<br/>
 ![highlght-config](https://i.gyazo.com/c3b330403100e55b1938882f49d353fc.png)

@@ -257,7 +257,7 @@ public class CoxScouterExternalOverlay extends OverlayPanel
 					String bossNameLC = room.getName().toLowerCase();
 					if (config.showRecommendedItems() && plugin.getRecommendedItemsList().get(bossNameLC) != null)
 						imageIds.addAll(plugin.getRecommendedItemsList().get(bossNameLC));
-					if (plugin.getRoomHighlightedList().contains(bossNameLC))
+					if (plugin.getRoomHighlightedList().contains(bossNameLC) && !config.highlightColor().equals(Color.WHITE))
 					{
 						color = config.highlightColor();
 					}
