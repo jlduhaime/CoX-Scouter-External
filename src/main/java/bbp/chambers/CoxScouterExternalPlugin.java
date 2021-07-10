@@ -230,7 +230,7 @@ public class CoxScouterExternalPlugin extends Plugin
 		}
 		else if (event.getEntry().getOption().equals(CoxScouterExternalOverlay.SCREENSHOT_ACTION))
 		{
-			screenshotScoutOverlay();
+			clientThread.invoke(CoxScouterExternalPlugin.this::screenshotScoutOverlay);
 		}
 	}
 
@@ -456,7 +456,7 @@ public class CoxScouterExternalPlugin extends Plugin
 		@Override
 		public void hotkeyPressed()
 		{
-			screenshotScoutOverlay();
+			clientThread.invoke(CoxScouterExternalPlugin.this::screenshotScoutOverlay);
 		}
 	};
 

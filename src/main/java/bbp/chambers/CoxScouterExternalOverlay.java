@@ -111,7 +111,15 @@ public class CoxScouterExternalOverlay extends OverlayPanel
 		}
 
 		Color color = Color.WHITE;
-		String layout = plugin.getRaid().getLayout().toCodeString();
+		String layout;
+		try
+		{
+			layout = plugin.getRaid().getLayout().toCodeString();
+		}
+		catch (NullPointerException e)
+		{
+			layout = "";
+		}
 		FontMetrics metrics = graphics.getFontMetrics();
 
 		String displayLayout;
