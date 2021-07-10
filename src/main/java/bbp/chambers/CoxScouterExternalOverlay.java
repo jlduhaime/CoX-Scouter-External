@@ -71,9 +71,9 @@ public class CoxScouterExternalOverlay extends OverlayPanel
 	private static final int ICON_SIZE = 32;
 	private static final int SMALL_ICON_SIZE = 21;
 
-	private Client client;
-	private CoxScouterExternalPlugin plugin;
-	private CoxScouterExternalConfig config;
+	private final Client client;
+	private final CoxScouterExternalPlugin plugin;
+	private final CoxScouterExternalConfig config;
 
 	private final ItemManager itemManager;
 	private final SpriteManager spriteManager;
@@ -138,7 +138,7 @@ public class CoxScouterExternalOverlay extends OverlayPanel
 		}
 
 		boolean hide = false;
-		HashSet<String> roomNames = new HashSet();
+		HashSet<String> roomNames = new HashSet<>();
 		for (Room layoutRoom : plugin.getRaid().getLayout().getRooms())
 		{
 			int position = layoutRoom.getPosition();

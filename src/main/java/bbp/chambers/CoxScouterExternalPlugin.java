@@ -140,19 +140,19 @@ public class CoxScouterExternalPlugin extends Plugin
 	private ClientThread clientThread;
 
 	@Getter
-	private final Set<String> roomWhitelist = new HashSet<String>();
+	private final Set<String> roomWhitelist = new HashSet<>();
 
 	@Getter
-	private final Set<String> roomBlacklist = new HashSet<String>();
+	private final Set<String> roomBlacklist = new HashSet<>();
 
 	@Getter
-	private final Set<String> rotationWhitelist = new HashSet<String>();
+	private final Set<String> rotationWhitelist = new HashSet<>();
 
 	@Getter
-	private final Set<String> layoutWhitelist = new HashSet<String>();
+	private final Set<String> layoutWhitelist = new HashSet<>();
 
 	@Getter
-	private final Set<String> roomHighlightedList = new HashSet<String>();
+	private final Set<String> roomHighlightedList = new HashSet<>();
 
 	@Getter
 	private final Map<String, List<Integer>> recommendedItemsList = new HashMap<>();
@@ -176,10 +176,7 @@ public class CoxScouterExternalPlugin extends Plugin
 		overlayManager.add(overlay);
 		overlayManager.add(tutorialOverlay);
 		updateLists();
-		this.clientThread.invokeLater(() ->
-		{
-			this.checkRaidPresence();
-		});
+		this.clientThread.invokeLater(this::checkRaidPresence);
 		keyManager.registerKeyListener(screenshotHotkeyListener);
 	}
 
@@ -237,10 +234,7 @@ public class CoxScouterExternalPlugin extends Plugin
 	@Subscribe
 	public void onVarbitChanged(VarbitChanged event)
 	{
-		this.clientThread.invokeLater(() ->
-		{
-			this.checkRaidPresence();
-		});
+		this.clientThread.invokeLater(this::checkRaidPresence);
 	}
 
 	@Subscribe
