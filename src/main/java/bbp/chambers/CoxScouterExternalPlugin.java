@@ -481,7 +481,8 @@ public class CoxScouterExternalPlugin extends Plugin
 			}
 		}
 
-		return getRaidPartyID() != -1 && configManager.getConfiguration("raids", "scoutOverlayAtBank", Boolean.class);
+		Boolean overlayAtBank = configManager.getConfiguration("raids", "scoutOverlayAtBank", Boolean.class);
+		return getRaidPartyID() != -1 && overlayAtBank;
 	}
 
 	private void checkRaidPresence()

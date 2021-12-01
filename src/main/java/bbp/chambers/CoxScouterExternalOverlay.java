@@ -109,6 +109,9 @@ public class CoxScouterExternalOverlay extends OverlayPanel
 		{
 			return null;
 		}
+		Boolean ccDisplay = configManager.getConfiguration("raids", "ccDisplay", Boolean.class);
+		Boolean enabledWhitelist = configManager.getConfiguration("raids", "enableLayoutWhitelist", Boolean.class);
+		Boolean rotationWhitelist = configManager.getConfiguration("raids", "enableRotationWhitelist", Boolean.class);
 
 		Color color = Color.WHITE;
 		String layout;
@@ -132,7 +135,7 @@ public class CoxScouterExternalOverlay extends OverlayPanel
 		{
 			displayLayout = layout;
 		}
-		if (configManager.getConfiguration("raids", "enableLayoutWhitelist", Boolean.class) && !plugin.getLayoutWhitelist().contains(layout.toLowerCase()))
+		if (enabledWhitelist && !plugin.getLayoutWhitelist().contains(layout.toLowerCase()))
 		{
 			color = Color.RED;
 		}
@@ -176,7 +179,7 @@ public class CoxScouterExternalOverlay extends OverlayPanel
 			}
 			if (config.hideMissingLayout())
 			{
-				if (configManager.getConfiguration("raids", "enableLayoutWhitelist", Boolean.class) && !plugin.getLayoutWhitelist().contains(layout.toLowerCase()))
+				if (enabledWhitelist && !plugin.getLayoutWhitelist().contains(layout.toLowerCase()))
 				{
 					hide = true;
 				}
@@ -202,7 +205,7 @@ public class CoxScouterExternalOverlay extends OverlayPanel
 				.color(color)
 				.build());
 
-		if (configManager.getConfiguration("raids", "ccDisplay", Boolean.class))
+		if (ccDisplay)
 		{
 			color = Color.RED;
 			FriendsChatManager friendsChatManager = client.getFriendsChatManager();
@@ -274,7 +277,7 @@ public class CoxScouterExternalOverlay extends OverlayPanel
 						color = Color.GREEN;
 					}
 					else if (plugin.getRoomBlacklist().contains(bossNameLC)
-							|| configManager.getConfiguration("raids", "enableRotationWhitelist", Boolean.class) && !plugin.getRotationMatches())
+							|| rotationWhitelist && !plugin.getRotationMatches())
 					{
 						color = Color.RED;
 					}
@@ -321,7 +324,7 @@ public class CoxScouterExternalOverlay extends OverlayPanel
 			panelImages.getChildren().clear();
 			Integer[] idArray = imageIds.toArray(new Integer[0]);
 			int fontHeight = metrics.getHeight();
-			int imagesVerticalOffset = 2 + BORDER_OFFSET + fontHeight + (configManager.getConfiguration("raids", "ccDisplay", Boolean.class) ? fontHeight : 0);
+			int imagesVerticalOffset = 2 + BORDER_OFFSET + fontHeight + (ccDisplay ? fontHeight : 0);
 			int imagesMaxHeight = (int) panelDims.getHeight() - BORDER_OFFSET - imagesVerticalOffset;
 			boolean smallImages = false;
 
