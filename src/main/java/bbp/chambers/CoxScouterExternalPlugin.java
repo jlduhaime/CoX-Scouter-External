@@ -66,10 +66,9 @@ import net.runelite.client.util.HotkeyListener;
 import net.runelite.client.util.ImageCapture;
 import net.runelite.client.util.ImageUploadStyle;
 import net.runelite.client.util.Text;
-import net.runelite.client.ws.PartyMember;
-import net.runelite.client.ws.PartyService;
-import net.runelite.client.ws.WSClient;
-import net.runelite.http.api.ws.messages.party.PartyChatMessage;
+import net.runelite.client.party.PartyMember;
+import net.runelite.client.party.PartyService;
+import net.runelite.client.party.messages.PartyChatMessage;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -126,9 +125,6 @@ public class CoxScouterExternalPlugin extends Plugin
 
 	@Inject
 	private PartyService party;
-
-	@Inject
-	private WSClient ws;
 
 	@Inject
 	private ChatMessageManager chatMessageManager;
@@ -384,7 +380,7 @@ public class CoxScouterExternalPlugin extends Plugin
 		{
 			final PartyChatMessage message = new PartyChatMessage(layoutMessage);
 			message.setMemberId(localMember.getMemberId());
-			ws.send(message);
+			party.send(message);
 		}
 	}
 
@@ -492,9 +488,9 @@ public class CoxScouterExternalPlugin extends Plugin
 			return;
 		}
 
-		int tempRaidState = client.getVar(Varbits.RAID_STATE);
+		int tempRaidState = client.getVarbitValue(Varbits.RAID_STATE);
 		int tempPartyID = client.getVar(VarPlayer.IN_RAID_PARTY);
-		boolean tempInRaid = client.getVar(Varbits.IN_RAID) == 1;
+		boolean tempInRaid = client.getVarbitValue(Varbits.IN_RAID) == 1;
 
 		// if the player's party state has changed
 		if (tempPartyID != raidPartyID)
