@@ -311,10 +311,18 @@ public class CoxScouterExternalPlugin extends Plugin
 					continue;
 				if (itemName.equals("ice barrage"))
 					map.get(key).add(SpriteID.SPELL_ICE_BARRAGE);
+				else if (itemName.matches("\\d*"))
+					try {
+						map.get(key).add(Integer.parseInt(itemName));
+					} catch(NumberFormatException e) {
+						log.warn("Caught NumberFormatException for explicit ItemID in scouter item overlay");
+					}
 				else if (itemName.startsWith("salve"))
 					map.get(key).add(ItemID.SALVE_AMULETEI);
 				else if (itemName.contains("blowpipe"))
 					map.get(key).add(ItemID.TOXIC_BLOWPIPE);
+				else if (itemName.contains("slayer helm"))
+					map.get(key).add(ItemID.SLAYER_HELMET_I);
 				else if (itemManager.search(itemName).size() > 0)
 					map.get(key).add(itemManager.search(itemName).get(0).getId());
 				else
