@@ -445,7 +445,7 @@ public class CoxScouterExternalPlugin extends Plugin
 		graphic.fillRect(0, 0, overlayDimensions.width, overlayDimensions.height);
 		overlay.render(graphic);
 
-		imageCapture.takeScreenshot(overlayImage, "CoX_scout-", false, configManager.getConfiguration("raids", "uploadScreenshot", ImageUploadStyle.class));
+		imageCapture.saveScreenshot(overlayImage, "CoX_scout-", null, false, configManager.getConfiguration("raids", "copyToClipboard", Boolean.class));
 		graphic.dispose();
 	}
 
@@ -472,11 +472,6 @@ public class CoxScouterExternalPlugin extends Plugin
 			// If the raid has started
 			if (raidState > 0)
 			{
-				if (client.getPlane() == OLM_PLANE)
-				{
-					return false;
-				}
-
 				return configManager.getConfiguration("raids", "scoutOverlayInRaid", Boolean.class);
 			}
 			else
@@ -497,7 +492,7 @@ public class CoxScouterExternalPlugin extends Plugin
 		}
 
 		int tempRaidState = client.getVarbitValue(Varbits.RAID_STATE);
-		int tempPartyID = client.getVar(VarPlayer.IN_RAID_PARTY);
+		int tempPartyID = client.getVarpValue(VarPlayer.IN_RAID_PARTY);
 		boolean tempInRaid = client.getVarbitValue(Varbits.IN_RAID) == 1;
 
 		// if the player's party state has changed
