@@ -109,9 +109,9 @@ public class CoxScouterExternalOverlay extends OverlayPanel
 		{
 			return null;
 		}
-		Boolean ccDisplay = configManager.getConfiguration("raids", "ccDisplay", Boolean.class);
-		Boolean enabledWhitelist = configManager.getConfiguration("raids", "enableLayoutWhitelist", Boolean.class);
-		Boolean rotationWhitelist = configManager.getConfiguration("raids", "enableRotationWhitelist", Boolean.class);
+		boolean ccDisplay = configManager.getConfiguration("raids", "ccDisplay", Boolean.class);
+		boolean enabledWhitelist = configManager.getConfiguration("raids", "enableLayoutWhitelist", Boolean.class);
+		boolean rotationWhitelist = configManager.getConfiguration("raids", "enableRotationWhitelist", Boolean.class);
 
 		Color color = Color.WHITE;
 		String layout;
