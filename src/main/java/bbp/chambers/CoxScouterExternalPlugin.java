@@ -497,17 +497,7 @@ public class CoxScouterExternalPlugin extends Plugin
 			return;
 		}
 
-		Rectangle overlayDimensions;
-
-		if (droppedSupplies.isEmpty())
-		{
-			overlayDimensions = overlay.getBounds();
-		}
-		else
-		{
-			overlayDimensions = new Rectangle();
-			overlayDimensions.setBounds(overlay.getBounds().x, overlay.getBounds().y, overlay.getBounds().width, overlay.getBounds().height - 95);
-		}
+		Rectangle overlayDimensions = overlay.getBounds();
 
 		BufferedImage overlayImage = new BufferedImage(overlayDimensions.width, overlayDimensions.height, BufferedImage.TYPE_INT_RGB);
 		Graphics2D graphic = overlayImage.createGraphics();
