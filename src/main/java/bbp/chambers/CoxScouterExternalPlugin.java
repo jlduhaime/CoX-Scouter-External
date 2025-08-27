@@ -34,7 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
-import net.runelite.api.ItemID;
+import net.runelite.api.gameval.ItemID;
 import net.runelite.api.MenuAction;
 import net.runelite.api.SpriteID;
 import net.runelite.api.VarPlayer;
@@ -64,7 +64,6 @@ import net.runelite.client.plugins.raids.solver.Room;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.util.HotkeyListener;
 import net.runelite.client.util.ImageCapture;
-import net.runelite.client.util.ImageUploadStyle;
 import net.runelite.client.util.Text;
 import net.runelite.client.party.PartyMember;
 import net.runelite.client.party.PartyService;
@@ -154,6 +153,9 @@ public class CoxScouterExternalPlugin extends Plugin
 	private final Map<String, List<Integer>> recommendedItemsList = new HashMap<>();
 
 	@Getter
+	private final Map<String, Integer> droppedSupplies = new HashMap<>();
+
+	@Getter
 	private int raidPartyID;
 
 	@Getter
@@ -200,6 +202,7 @@ public class CoxScouterExternalPlugin extends Plugin
 	public void onRaidScouted(RaidScouted raidScouted)
 	{
 		this.raid = raidScouted.getRaid();
+		setSupplyMap(droppedSupplies, raid);
 	}
 
 	@Subscribe
@@ -287,6 +290,63 @@ public class CoxScouterExternalPlugin extends Plugin
 		}
 	}
 
+	private void setSupplyMap(Map<String,Integer> map, Raid raid)
+	{
+		if (raid == null)
+		{
+			map.clear();
+			return;
+		}
+		int numOvl = 0;
+		int numEnh = 0;
+		int numAid = 0;
+		int numRev = 0;
+
+		for (Room r: raid.getLayout().getRooms())
+		{
+			RaidRoom room = raid.getRoom(r.getPosition());
+			String roomName = room.getName().toLowerCase();
+
+			switch (roomName)
+			{
+				case "tekton":
+					numOvl += 1;
+					numEnh += 1;
+					numRev += 1;
+					break;
+				case "muttadiles":
+					numOvl += 2;
+					numEnh += 2;
+					numAid += 1;
+					numRev += 1;
+					break;
+				case "vanguards":
+					numOvl += 1;
+					numEnh += 1;
+					numAid += 4;
+					numRev += 2;
+					break;
+				case "vasa":
+					numOvl += 1;
+					numAid += 2;
+					break;
+				case "vespula":
+					numOvl += 1;
+					numEnh += 1;
+					numAid += 2;
+					numRev += 1;
+					break;
+				default:
+					break;
+			}
+		}
+
+		map.put("overloads", numOvl);
+		map.put("prayer_enhances", numEnh);
+		map.put("aids", numAid);
+		map.put("revitalizations", numRev);
+	}
+
 	private void updateMap(Map<String, List<Integer>> map, String input)
 	{
 		map.clear();
@@ -318,11 +378,11 @@ public class CoxScouterExternalPlugin extends Plugin
 						log.warn("Caught NumberFormatException for explicit ItemID in scouter item overlay");
 					}
 				else if (itemName.startsWith("salve"))
-					map.get(key).add(ItemID.SALVE_AMULETEI);
+					map.get(key).add(ItemID.SW_SALVE_AMULET_E);
 				else if (itemName.contains("blowpipe"))
 					map.get(key).add(ItemID.TOXIC_BLOWPIPE);
 				else if (itemName.contains("slayer helm"))
-					map.get(key).add(ItemID.SLAYER_HELMET_I);
+					map.get(key).add(ItemID.SLAYER_HELM_I);
 				else if (itemManager.search(itemName).size() > 0)
 					map.get(key).add(itemManager.search(itemName).get(0).getId());
 				else
@@ -437,7 +497,18 @@ public class CoxScouterExternalPlugin extends Plugin
 			return;
 		}
 
-		Rectangle overlayDimensions = overlay.getBounds();
+		Rectangle overlayDimensions;
+
+		if (droppedSupplies.isEmpty())
+		{
+			overlayDimensions = overlay.getBounds();
+		}
+		else
+		{
+			overlayDimensions = new Rectangle();
+			overlayDimensions.setBounds(overlay.getBounds().x, overlay.getBounds().y, overlay.getBounds().width, overlay.getBounds().height - 95);
+		}
+
 		BufferedImage overlayImage = new BufferedImage(overlayDimensions.width, overlayDimensions.height, BufferedImage.TYPE_INT_RGB);
 		Graphics2D graphic = overlayImage.createGraphics();
 		graphic.setFont(runeLiteConfig.interfaceFontType().getFont());

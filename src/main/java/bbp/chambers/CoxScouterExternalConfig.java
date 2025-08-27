@@ -102,6 +102,14 @@ public interface CoxScouterExternalConfig extends Config
 
 	@ConfigItem(
 		position = 6,
+		keyName = "showSupplies",
+		name = "Show Supplies",
+		description = "Shows dropped supplies from scouted rooms for no-prep planning"
+	)
+	default boolean showSupplies() { return false; }
+
+	@ConfigItem(
+		position = 7,
 		keyName = "highlightedRooms",
 		name = "Highlighted rooms",
 		description = "Display highlighted rooms in a different color on the overlay. Separate with comma (full name)"
@@ -112,7 +120,7 @@ public interface CoxScouterExternalConfig extends Config
 	}
 
 	@ConfigItem(
-		position = 7,
+		position = 8,
 		keyName = "highlightColor",
 		name = "Highlight color",
 		description = "The color of highlighted rooms"
@@ -123,7 +131,7 @@ public interface CoxScouterExternalConfig extends Config
 	}
 
 	@ConfigItem(
-		position = 8,
+		position = 9,
 		keyName = "hideMissingHighlighted",
 		name = "Hide missing highlighted",
 		description = "Completely hides raids missing highlighted room(s)"
@@ -134,7 +142,7 @@ public interface CoxScouterExternalConfig extends Config
 	}
 
 	@ConfigItem(
-		position = 9,
+		position = 10,
 		keyName = "highlightedShowThreshold",
 		name = "Show threshold",
 		description = "The number of highlighted rooms needed to show the raid. 0 means no threshold."
@@ -145,7 +153,7 @@ public interface CoxScouterExternalConfig extends Config
 	}
 
 	@ConfigItem(
-		position = 10,
+		position = 11,
 		keyName = "hideBlacklist",
 		name = "Hide raids with blacklisted",
 		description = "Completely hides raids containing blacklisted room(s)"
@@ -156,7 +164,7 @@ public interface CoxScouterExternalConfig extends Config
 	}
 
 	@ConfigItem(
-		position = 11,
+		position = 12,
 		keyName = "hideMissingLayout",
 		name = "Hide missing layout",
 		description = "Completely hides raids missing a whitelisted layout"
@@ -167,7 +175,7 @@ public interface CoxScouterExternalConfig extends Config
 	}
 
 	@ConfigItem(
-		position = 12,
+		position = 13,
 		keyName = "hideRopeless",
 		name = "Hide ropeless raids",
 		description = "Completely hides raids missing a tightrope"

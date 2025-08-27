@@ -32,6 +32,7 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import javax.inject.Inject;
 import net.runelite.api.FriendsChatManager;
@@ -112,6 +113,7 @@ public class CoxScouterExternalOverlay extends OverlayPanel
 		boolean ccDisplay = configManager.getConfiguration("raids", "ccDisplay", Boolean.class);
 		boolean enabledWhitelist = configManager.getConfiguration("raids", "enableLayoutWhitelist", Boolean.class);
 		boolean rotationWhitelist = configManager.getConfiguration("raids", "enableRotationWhitelist", Boolean.class);
+		boolean showSupplies = config.showSupplies();
 
 		Color color = Color.WHITE;
 		String layout;
@@ -315,6 +317,45 @@ public class CoxScouterExternalOverlay extends OverlayPanel
 							.build());
 					break;
 			}
+		}
+
+		// add room supply drops
+		if (showSupplies)
+		{
+			Map<String, Integer> supplies = plugin.getDroppedSupplies();
+
+			panelComponent.getChildren().add(LineComponent.builder().build());
+
+			panelComponent.getChildren().add(TitleComponent.builder()
+				.text("Supply Drops")
+				.color(Color.ORANGE).build());
+			panelComponent.getChildren().add(LineComponent.builder()
+				.left("Overloads:")
+				.right(Integer.toString(supplies.get("overloads")))
+				.leftColor(color)
+				.rightColor(color)
+				.build());
+
+			panelComponent.getChildren().add(LineComponent.builder()
+				.left("Prayer Enhances:")
+				.right(Integer.toString(supplies.get("prayer_enhances")))
+				.leftColor(color)
+				.rightColor(color)
+				.build());
+
+			panelComponent.getChildren().add(LineComponent.builder()
+				.left("Xeric Aids:")
+				.right(Integer.toString(supplies.get("aids")))
+				.rightColor(color)
+				.leftColor(color)
+				.build());
+
+			panelComponent.getChildren().add(LineComponent.builder()
+				.left("Revitilizations:")
+				.right(Integer.toString(supplies.get("revitalizations")))
+				.leftColor(color)
+				.rightColor(color)
+				.build());
 		}
 
 		//add recommended items
